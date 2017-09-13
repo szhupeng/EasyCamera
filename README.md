@@ -1,4 +1,4 @@
-EasyCamera [![API](https://img.shields.io/badge/API-14%2B-blue.svg?style=flat)](https://android-arsenal.com/api?level=11)
+EasyCamera [![API](https://img.shields.io/badge/API-11%2B-blue.svg?style=flat)](https://android-arsenal.com/api?level=11)
 ============
 
 EasyCamera is a custom camera library.
