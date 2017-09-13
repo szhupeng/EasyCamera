@@ -1,0 +1,15 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Widget.CameraView" parent="android:Widget">
+        <item name="android:adjustViewBounds">true</item>
+        <item name="facing">back</item>
+        <item name="autoFocus">true</item>
+        <item name="flash">auto</item>
+    </style>
+</resources>
