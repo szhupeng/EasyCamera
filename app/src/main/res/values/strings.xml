@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">EasyCamera</string>
+    <string name="reach_max_prompt">你最多可以选择%1$d张图片</string>
+    <string name="picture_error">图片已移除</string>
 </resources>

@@ -286,7 +286,13 @@ class Camera2Impl extends CameraApi {
     }
 
     @Override
-    void recordVideo() {
+    void startRecordVideo(String dirPath, String fileName) {
+
+    }
+
+    @Override
+    void stopRecordVideo() {
+
     }
 
     /**

@@ -16,6 +16,10 @@ public abstract class PictureCallback implements Callback {
     }
 
     @Override
-    public void onVideoRecorded(CameraView cameraVie) {
+    public void onStartRecord(String dirPath, String fileName, CameraView cameraVie) {
+    }
+
+    @Override
+    public void onStopRecord(CameraView cameraVie) {
     }
 }

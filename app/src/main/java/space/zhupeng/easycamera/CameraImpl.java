@@ -3,6 +3,7 @@ package space.zhupeng.easycamera;
 import android.graphics.PixelFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
+import android.media.MediaRecorder;
 import android.os.Build;
 import android.support.v4.util.SparseArrayCompat;
 import android.view.SurfaceHolder;
@@ -12,6 +13,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import space.zhupeng.easycamera.utils.CameraHelper;
 
 /**
  * Created by zhupeng on 2017/9/1.
@@ -179,7 +182,9 @@ class CameraImpl extends CameraApi {
                 @Override
                 public void onPictureTaken(byte[] data, Camera camera) {
                     isCapturing.set(false);
-                    mCallback.onPictureTaken(data);
+                    if (mCallback != null) {
+                        mCallback.onPictureTaken(data);
+                    }
                     camera.cancelAutoFocus();
                     camera.startPreview();
                 }
@@ -187,9 +192,40 @@ class CameraImpl extends CameraApi {
         }
     }
 
-    @Override
-    void recordVideo() {
 
+    @Override
+    void startRecordVideo(final String dirPath, final String fileName) {
+        if (!isCameraOpened()) {
+            throw new IllegalStateException("Camera is not ready. Call start() before startRecordVideo(String).");
+        }
+
+        if (isRecording) return;
+
+        if (prepareVideoRecorder(dirPath)) {
+            mVideoRecorder.start();
+            isRecording = true;
+            if (mCallback != null) {
+                mCallback.onStartRecord(dirPath, fileName);
+            }
+        }
+    }
+
+    @Override
+    void stopRecordVideo() {
+        if (isRecording) {
+            try {
+                if (mVideoRecorder != null) mVideoRecorder.stop();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            isRecording = false;
+            releaseVideoRecorder();
+
+            if (mCallback != null) {
+                mCallback.onStopRecord();
+            }
+        }
     }
 
     final void setPreviewMedium() {
@@ -258,6 +294,7 @@ class CameraImpl extends CameraApi {
             releaseCamera();
         }
         mCamera = Camera.open(mCameraId);
+        mCamcorderProfile = CameraHelper.getCamcorderProfile(mCameraId, -1, -1);
         mCameraParameters = mCamera.getParameters();
         adjustCameraParameters();
         mCamera.setDisplayOrientation(calculateOrientation(mDisplayOrientation));
@@ -357,6 +394,58 @@ class CameraImpl extends CameraApi {
      */
     private boolean isLandscape(int degrees) {
         return (degrees == 90 || degrees == 270);
+    }
+
+    private boolean prepareVideoRecorder(final String path) {
+        mVideoRecorder = new MediaRecorder();
+        try {
+            mCamera.lock();
+            mCamera.unlock();
+            mVideoRecorder.setCamera(mCamera);
+
+            mVideoRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
+            mVideoRecorder.setVideoSource(MediaRecorder.VideoSource.DEFAULT);
+
+            mVideoRecorder.setOutputFormat(mCamcorderProfile.fileFormat);
+            mVideoRecorder.setVideoFrameRate(mCamcorderProfile.videoFrameRate);
+            mVideoRecorder.setVideoSize(mPreviewView.getWidth(), mPreviewView.getHeight());
+            mVideoRecorder.setVideoEncodingBitRate(mCamcorderProfile.videoBitRate);
+            mVideoRecorder.setVideoEncoder(mCamcorderProfile.videoCodec);
+
+            mVideoRecorder.setAudioEncodingBitRate(mCamcorderProfile.audioBitRate);
+            mVideoRecorder.setAudioChannels(mCamcorderProfile.audioChannels);
+            mVideoRecorder.setAudioSamplingRate(mCamcorderProfile.audioSampleRate);
+            mVideoRecorder.setAudioEncoder(mCamcorderProfile.audioCodec);
+
+            mVideoRecorder.setOutputFile(path);
+            mVideoRecorder.setMaxFileSize(-1);
+            mVideoRecorder.setMaxDuration(-1);
+            mVideoRecorder.setOrientationHint(calculateRotation(mDisplayOrientation));
+            mVideoRecorder.setPreviewDisplay(mPreviewView.getSurface());
+
+            mVideoRecorder.prepare();
+            return true;
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+
+        releaseVideoRecorder();
+        return false;
+    }
+
+    @Override
+    protected void releaseVideoRecorder() {
+        super.releaseVideoRecorder();
+
+        try {
+            mCamera.lock(); // lock camera for later use
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**

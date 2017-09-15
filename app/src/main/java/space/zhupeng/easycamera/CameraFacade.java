@@ -19,7 +19,7 @@ import space.zhupeng.easycamera.compress.CompressResultListener;
  * Created by zhupeng on 2017/8/31.
  */
 
-public class CameraHelper {
+public class CameraFacade {
 
     private CameraView mCameraView;
 
@@ -34,14 +34,14 @@ public class CameraHelper {
     private CompressResultListener mCompressResultListener;
 
     private static class CameraHelperHolder {
-        private static final CameraHelper INSTANCE = new CameraHelper();
+        private static final CameraFacade INSTANCE = new CameraFacade();
     }
 
-    private CameraHelper() {
+    private CameraFacade() {
     }
 
-    public static final CameraHelper of(CameraView cameraView) {
-        CameraHelper helper = CameraHelperHolder.INSTANCE;
+    public static final CameraFacade of(CameraView cameraView) {
+        CameraFacade helper = CameraHelperHolder.INSTANCE;
         helper.setCameraView(cameraView);
         return helper;
     }
@@ -77,7 +77,7 @@ public class CameraHelper {
         }
     }
 
-    public CameraHelper setCallback(Callback callback) {
+    public CameraFacade setCallback(Callback callback) {
         this.mCallback = callback;
         return this;
     }
@@ -86,7 +86,7 @@ public class CameraHelper {
      * @param dirPath  The directory path of the picture to save
      * @param fileName The picture name to save
      */
-    public CameraHelper takePicture(@Nullable String dirPath, @Nullable String fileName) {
+    public CameraFacade takePicture(@Nullable String dirPath, @Nullable String fileName) {
         if (TextUtils.isEmpty(dirPath)) {
             mDirPath = Environment.getExternalStorageDirectory().getPath();
         } else {

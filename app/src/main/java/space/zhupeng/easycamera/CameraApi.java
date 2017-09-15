@@ -1,5 +1,8 @@
 package space.zhupeng.easycamera;
 
+import android.media.CamcorderProfile;
+import android.media.MediaRecorder;
+
 /**
  * Created by zhupeng on 2017/8/31.
  */
@@ -14,16 +17,35 @@ abstract class CameraApi {
 
         void onPictureTaken(byte[] data);
 
-        void onVideoRecorded();
+        void onStartRecord(final String dirPath, final String fileName);
+
+        void onStopRecord();
     }
 
     protected final Callback mCallback;
 
     protected final PreviewView mPreviewView;
 
+    protected MediaRecorder mVideoRecorder;
+    protected CamcorderProfile mCamcorderProfile;
+    protected boolean isRecording;
+
     public CameraApi(Callback callback, PreviewView preview) {
         this.mCallback = callback;
         this.mPreviewView = preview;
+    }
+
+    protected void releaseVideoRecorder() {
+        try {
+            if (mVideoRecorder != null) {
+                mVideoRecorder.reset();
+                mVideoRecorder.release();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            mVideoRecorder = null;
+        }
     }
 
     abstract boolean start();
@@ -52,7 +74,15 @@ abstract class CameraApi {
     abstract void takePicture();
 
     /**
-     * 录制视频
+     * 开始录制视频
+     *
+     * @param dirPath  视频存储路径
+     * @param fileName 视频文件名称
      */
-    abstract void recordVideo();
+    abstract void startRecordVideo(final String dirPath, final String fileName);
+
+    /**
+     * 停止录制视频
+     */
+    abstract void stopRecordVideo();
 }

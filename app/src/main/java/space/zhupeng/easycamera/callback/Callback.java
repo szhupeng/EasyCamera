@@ -30,9 +30,18 @@ public interface Callback {
     void onPictureTaken(byte[] data, CameraView cameraView);
 
     /**
-     * Called when a video is recorded.
+     * Called when starting record a video
+     *
+     * @param dirPath   视频存储路径
+     * @param fileName  视频文件名称
+     * @param cameraVie
+     */
+    void onStartRecord(final String dirPath, final String fileName, CameraView cameraVie);
+
+    /**
+     * Called when stopping record a video
      *
      * @param cameraVie
      */
-    void onVideoRecorded(CameraView cameraVie);
+    void onStopRecord(CameraView cameraVie);
 }

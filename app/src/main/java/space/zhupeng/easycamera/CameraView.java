@@ -24,7 +24,6 @@ import android.widget.FrameLayout;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import space.zhupeng.easycamera.R;
 import space.zhupeng.easycamera.callback.Callback;
 
 public class CameraView extends FrameLayout implements CheckPermissionListener {
@@ -119,8 +118,8 @@ public class CameraView extends FrameLayout implements CheckPermissionListener {
         // Display orientation detector
         mDisplayOrientationDetector = new DisplayOrientationDetector(context) {
             @Override
-            public void onDisplayOrientationChanged(int displayOrientation) {
-                mCameraApi.setDisplayOrientation(displayOrientation);
+            public void onDisplayOrientationChanged(int orientation) {
+                mCameraApi.setDisplayOrientation(orientation);
             }
         };
     }
@@ -230,10 +229,20 @@ public class CameraView extends FrameLayout implements CheckPermissionListener {
     }
 
     /**
-     * Record a video. The result will be returned to {@link Callback#onVideoRecorded(CameraView)}.
+     * Start record a video. The result will be returned to {@link Callback#onStartRecord(String, String, CameraView)}.
+     *
+     * @param dirPath  The path of the video to save
+     * @param fileName The name of the video file
      */
-    public void recordVideo() {
-        mCameraApi.recordVideo();
+    public void startRecordVideo(final String dirPath, final String fileName) {
+        mCameraApi.startRecordVideo(dirPath, fileName);
+    }
+
+    /**
+     * Stop record a video. The result will be returned to {@link Callback#onStopRecord(CameraView)}.
+     */
+    public void stopRecordVideo() {
+        mCameraApi.stopRecordVideo();
     }
 
     @Override
@@ -311,9 +320,16 @@ public class CameraView extends FrameLayout implements CheckPermissionListener {
         }
 
         @Override
-        public void onVideoRecorded() {
+        public void onStartRecord(String dirPath, String fileName) {
             if (mCallback != null) {
-                mCallback.onVideoRecorded(CameraView.this);
+                mCallback.onStartRecord(dirPath, fileName, CameraView.this);
+            }
+        }
+
+        @Override
+        public void onStopRecord() {
+            if (mCallback != null) {
+                mCallback.onStopRecord(CameraView.this);
             }
         }
     }
