@@ -27,6 +27,4 @@ public class FileUriCompat {
         Uri fileUri = FileProvider.getUriForFile(context, context.getPackageName() + ".fileprovider", file);
         return fileUri;
     }
-
-
 }
